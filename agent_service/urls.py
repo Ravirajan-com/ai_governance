@@ -8,3 +8,5 @@ app_name = "agent_service"
 urlpatterns = [
     path("data/", AgentDataAPIView.as_view(), name="agent-data"),
 ]
+
+#
