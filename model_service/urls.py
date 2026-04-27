@@ -1,16 +1,30 @@
 from django.urls import path
 
 from .views import (
-    ModelListCreateAPIView,
-    OrganizationModelAccessListCreateAPIView,
-    UserModelPermissionListCreateAPIView,
+    FeatureListCreateAPIView,
+    FeaturePermissionCheckAPIView,
+    OrganizationFeatureAccessListCreateAPIView,
+    UserFeaturePermissionListCreateAPIView,
 )
 
 
 app_name = "model_service"
 
 urlpatterns = [
-    path("", ModelListCreateAPIView.as_view(), name="model-list-create"),
-    path("organization-access/", OrganizationModelAccessListCreateAPIView.as_view(), name="organization-model-access-list-create"),
-    path("user-permissions/", UserModelPermissionListCreateAPIView.as_view(), name="user-model-permission-list-create"),
+    path("features/", FeatureListCreateAPIView.as_view(), name="feature-list-create"),
+    path(
+        "features/permission-check/",
+        FeaturePermissionCheckAPIView.as_view(),
+        name="feature-permission-check",
+    ),
+    path(
+        "organization-feature-access/",
+        OrganizationFeatureAccessListCreateAPIView.as_view(),
+        name="organization-feature-access-list-create",
+    ),
+    path(
+        "user-feature-permissions/",
+        UserFeaturePermissionListCreateAPIView.as_view(),
+        name="user-feature-permission-list-create",
+    ),
 ]

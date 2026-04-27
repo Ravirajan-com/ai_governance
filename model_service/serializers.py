@@ -1,45 +1,45 @@
 from rest_framework import serializers
 
-from .models import Model, OrganizationModelAccess, UserModelPermission
+from .models import Feature, OrganizationFeatureAccess, UserFeaturePermission
 
 
-class ModelSerializer(serializers.ModelSerializer):
+class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Model
+        model = Feature
         fields = ["id", "name", "description", "created_at"]
         read_only_fields = ["id", "created_at"]
 
     def validate_name(self, value: str) -> str:
         value = value.strip()
         if not value:
-            raise serializers.ValidationError("Model name cannot be blank.")
+            raise serializers.ValidationError("Feature name cannot be blank.")
         return value
 
     def validate_description(self, value: str) -> str:
         return value.strip()
 
 
-class OrganizationModelAccessSerializer(serializers.ModelSerializer):
+class OrganizationFeatureAccessSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrganizationModelAccess
-        fields = ["id", "organization_id", "model", "is_active"]
+        model = OrganizationFeatureAccess
+        fields = ["id", "organization_id", "feature", "is_active"]
         read_only_fields = ["id"]
 
     def validate(self, attrs):
-        if self.instance is None and OrganizationModelAccess.objects.filter(
+        if self.instance is None and OrganizationFeatureAccess.objects.filter(
             organization_id=attrs["organization_id"],
-            model=attrs["model"],
+            feature=attrs["feature"],
         ).exists():
             raise serializers.ValidationError(
-                "Organization access for this model already exists."
+                "Organization access for this feature already exists."
             )
         return attrs
 
 
-class UserModelPermissionSerializer(serializers.ModelSerializer):
+class UserFeaturePermissionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModelPermission
-        fields = ["id", "user_id", "model", "can_read", "can_write", "can_delete"]
+        model = UserFeaturePermission
+        fields = ["id", "user_id", "feature", "can_read", "can_write", "can_delete"]
         read_only_fields = ["id"]
 
     def validate(self, attrs):
@@ -52,11 +52,17 @@ class UserModelPermissionSerializer(serializers.ModelSerializer):
                 "At least one permission must be enabled."
             )
 
-        if self.instance is None and UserModelPermission.objects.filter(
+        if self.instance is None and UserFeaturePermission.objects.filter(
             user_id=attrs["user_id"],
-            model=attrs["model"],
+            feature=attrs["feature"],
         ).exists():
             raise serializers.ValidationError(
-                "User permissions for this model already exist."
+                "User permissions for this feature already exist."
             )
         return attrs
+
+
+class FeaturePermissionCheckSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    feature_id = serializers.UUIDField()
+    organization_id = serializers.UUIDField(required=False)
